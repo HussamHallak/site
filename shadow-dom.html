@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shadow DOM</title>
+</head>
+<body>
+    <h1>Shadow DOM</h1>
+  <!-- Uses a custom element with a shadow root that adds resources. -->
+    <my-element></my-element>
+    <script>
+        class MyElement extends HTMLElement {
+            constructor() {
+                super();
+                const shadow = this.attachShadow({mode: 'open'});
+                const img = document.createElement('img');
+                img.src = 'https://via.placeholder.com/250';
+                shadow.appendChild(img);
+                const style = document.createElement('style');
+                style.textContent = 'div { color: red; }';
+                shadow.appendChild(style);
+            }
+        }
+        customElements.define('my-element', MyElement);
+    </script>
+</body>
+</html>
