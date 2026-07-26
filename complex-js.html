@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complex JS</title>
+    <!-- External script (will be added to DOM) -->
+</head>
+<body>
+    <h1>Complex JS (external + multiple dynamic loads)</h1>
+  <!-- Loads an external script (e.g., a tracking pixel) and adds elements via fetch (simulated with setTimeout). -->
+    <div id="content"></div>
+    <script>
+        // Simulate loading an external script
+        var script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js';
+        document.head.appendChild(script);
+
+        // Add a resource after script loads
+        script.onload = function() {
+            var img = document.createElement('img');
+            img.src = 'https://via.placeholder.com/250';
+            document.getElementById('content').appendChild(img);
+        };
+
+        // Add multiple images with varying delays
+        function addDelayedImage(src, delay) {
+            setTimeout(function() {
+                var img = document.createElement('img');
+                img.src = src;
+                document.getElementById('content').appendChild(img);
+            }, delay);
+        }
+        addDelayedImage('https://via.placeholder.com/100', 1000);
+        addDelayedImage('https://via.placeholder.com/150', 3000);
+        addDelayedImage('https://via.placeholder.com/200', 6000);
+    </script>
+</body>
+</html>
