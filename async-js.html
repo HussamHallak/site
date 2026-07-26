@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Async JS</title>
+</head>
+<body>
+    <h1>Async JS (delayed additions)</h1>
+  <!-- Adds elements after delays (0s, 2s, 5s, 10s). -->
+    <div id="container"></div>
+    <script>
+        function addImage(src, alt) {
+            var img = document.createElement('img');
+            img.src = src;
+            img.alt = alt;
+            document.getElementById('container').appendChild(img);
+        }
+        // Immediate
+        addImage('https://via.placeholder.com/50', 'immediate');
+        // 2 seconds
+        setTimeout(function() { addImage('https://via.placeholder.com/80', '2s'); }, 2000);
+        // 5 seconds
+        setTimeout(function() { addImage('https://via.placeholder.com/120', '5s'); }, 5000);
+        // 10 seconds
+        setTimeout(function() { addImage('https://via.placeholder.com/160', '10s'); }, 10000);
+    </script>
+</body>
+</html>
