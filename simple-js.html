@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple JS</title>
+</head>
+<body>
+    <h1>Simple JS (adds image on load)</h1>
+  <!-- Adds an <img> on DOMContentLoaded. -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var img = document.createElement('img');
+            img.src = 'https://via.placeholder.com/200';
+            document.body.appendChild(img);
+        });
+    </script>
+    <img src="https://via.placeholder.com/100" alt="static">
+</body>
+</html>
