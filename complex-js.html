@@ -17,7 +17,7 @@
         // Add a resource after script loads
         script.onload = function() {
             var img = document.createElement('img');
-            img.src = 'https://via.placeholder.com/250';
+            img.src = './1.jpg';
             document.getElementById('content').appendChild(img);
         };
 
@@ -29,9 +29,9 @@
                 document.getElementById('content').appendChild(img);
             }, delay);
         }
-        addDelayedImage('https://via.placeholder.com/100', 1000);
-        addDelayedImage('https://via.placeholder.com/150', 3000);
-        addDelayedImage('https://via.placeholder.com/200', 6000);
+        addDelayedImage('./2.jpg', 1000);
+        addDelayedImage('./3.jpg', 3000);
+        addDelayedImage('./4.jpg', 6000);
     </script>
 </body>
 </html>
