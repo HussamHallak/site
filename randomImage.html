@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Random Image</title>
+</head>
+<body>
+  <img id="mainImage" alt="Random image">
+
+  <script>
+    const IMAGE_FILENAMES = [
+      '1.jpg',
+      '2.jpg',
+      '3.jpg'
+    ];
+
+    // ============================================================
+    // Seed randomized from window size
+    // ============================================================
+    function seededRandom() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      let seed = (w * 9301 + h * 49297) & 0x7fffffff;
+      seed = (seed * 16807) % 2147483647;
+      return seed / 2147483647;
+    }
+
+    // ============================================================
+    // Get image
+    // ============================================================
+    function loadImage() {
+      const img = document.getElementById('mainImage');
+      
+      if (IMAGE_FILENAMES.length === 0) return;
+
+      const rand = seededRandom();
+      const index = Math.floor(rand * IMAGE_FILENAMES.length);
+      const filename = IMAGE_FILENAMES[index];
+      
+      // Uses the current page's path to find images
+      const path = window.location.pathname;
+      const basePath = path.substring(0, path.lastIndexOf('/') + 1);
+      img.src = basePath + filename;
+      img.alt = filename;
+    }
+
+    loadImage();
+  </script>
+</body>
+</html>
