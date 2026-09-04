@@ -36,25 +36,31 @@
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#000000';
       
-      // Main message - cleaner and shorter
+      // Main message
       const mainText = `Browser Size`;
       ctx.font = 'bold 32px Arial, sans-serif';
-      ctx.fillText(mainText, 250, 180);
+      ctx.fillText(mainText, 250, 160);
       
       // Display dimensions prominently
       ctx.font = 'bold 48px Arial, sans-serif';
-      ctx.fillText(`${width} × ${height}`, 250, 260);
+      ctx.fillText(`${width} × ${height}`, 250, 240);
       
       // Subtext
       ctx.font = '16px Arial, sans-serif';
       ctx.fillStyle = '#666666';
-      ctx.fillText('pixels', 250, 310);
+      ctx.fillText('pixels', 250, 290);
       
-      // Timestamp to show it's live
+      // Full timestamp with year, month, day, hour, minutes, seconds
       ctx.font = '12px Arial, sans-serif';
       ctx.fillStyle = '#999999';
       const now = new Date();
-      ctx.fillText(`Updated: ${now.toLocaleTimeString()}`, 250, 470);
+      const timestamp = now.getFullYear() + '-' + 
+                       String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                       String(now.getDate()).padStart(2, '0') + ' ' + 
+                       String(now.getHours()).padStart(2, '0') + ':' + 
+                       String(now.getMinutes()).padStart(2, '0') + ':' + 
+                       String(now.getSeconds()).padStart(2, '0');
+      ctx.fillText(`Updated: ${timestamp}`, 250, 465);
     }
 
     // ============================================================
