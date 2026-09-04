@@ -5,11 +5,11 @@
   <title>Browser Size Display</title>
 </head>
 <body>
-  <canvas id="imageCanvas"></canvas>
+  <canvas id="imageCanvas" width="500" height="500"></canvas>
 
   <script>
     // ============================================================
-    // Generate image on canvas with browser dimensions
+    // Generate image with browser dimensions
     // ============================================================
     function generateImage() {
       const canvas = document.getElementById('imageCanvas');
@@ -18,62 +18,43 @@
       const width = window.innerWidth;
       const height = window.innerHeight;
       
-      // Set canvas size to match browser window
-      canvas.width = width;
-      canvas.height = height;
+      // Fixed canvas size 500x500
+      canvas.width = 500;
+      canvas.height = 500;
       
       // Background
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, width, height);
+      ctx.fillRect(0, 0, 500, 500);
+      
+      // Border
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(5, 5, 490, 490);
       
       // Text styling
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#000000';
       
-      // Main message
-      const mainText = `I am an image displayed in a browser that is ${width} in width and ${height} in height.`;
+      // Main message - cleaner and shorter
+      const mainText = `Browser Size`;
+      ctx.font = 'bold 32px Arial, sans-serif';
+      ctx.fillText(mainText, 250, 180);
       
-      // Adjust font size based on window dimensions
-      let fontSize = Math.min(width, height) / 20;
-      fontSize = Math.max(12, Math.min(fontSize, 48));
-      ctx.font = `${fontSize}px Arial, sans-serif`;
+      // Display dimensions prominently
+      ctx.font = 'bold 48px Arial, sans-serif';
+      ctx.fillText(`${width} × ${height}`, 250, 260);
       
-      // Wrap text if needed
-      const maxWidth = width * 0.9;
-      const words = mainText.split(' ');
-      let lines = [];
-      let currentLine = '';
-      
-      for (let i = 0; i < words.length; i++) {
-        const testLine = currentLine + words[i] + ' ';
-        const metrics = ctx.measureText(testLine);
-        if (metrics.width > maxWidth && currentLine.length > 0) {
-          lines.push(currentLine.trim());
-          currentLine = words[i] + ' ';
-        } else {
-          currentLine = testLine;
-        }
-      }
-      if (currentLine.length > 0) {
-        lines.push(currentLine.trim());
-      }
-      
-      // Draw each line
-      const lineHeight = fontSize * 1.4;
-      const totalHeight = lines.length * lineHeight;
-      let y = (height - totalHeight) / 2 + fontSize / 2;
-      
-      for (let i = 0; i < lines.length; i++) {
-        ctx.fillText(lines[i], width / 2, y);
-        y += lineHeight;
-      }
-      
-      // Add smaller secondary text with just the dimensions
-      ctx.font = `${fontSize * 0.6}px Arial, sans-serif`;
+      // Subtext
+      ctx.font = '16px Arial, sans-serif';
       ctx.fillStyle = '#666666';
-      const subText = `Width: ${width}px  |  Height: ${height}px`;
-      ctx.fillText(subText, width / 2, height - fontSize * 2);
+      ctx.fillText('pixels', 250, 310);
+      
+      // Timestamp to show it's live
+      ctx.font = '12px Arial, sans-serif';
+      ctx.fillStyle = '#999999';
+      const now = new Date();
+      ctx.fillText(`Updated: ${now.toLocaleTimeString()}`, 250, 470);
     }
 
     // ============================================================
