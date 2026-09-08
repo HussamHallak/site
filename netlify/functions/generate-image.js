@@ -20,8 +20,28 @@ exports.handler = async (event) => {
       };
     }
 
-    // Connect to blob storage
-    const store = getStore('images');
+    // ============================================================
+    // MANUALLY CONFIGURE BLOB STORAGE
+    // ============================================================
+    // You need to get these values from your Netlify dashboard
+    const siteID = process.env.ba1416c8-1ad6-4d18-9798-83a21c23399b;  // Your site ID
+    const token = process.env.nfp_6DU6kiqu5fDJxtLWzoePzjgwQVEFJVMWf324;  // Your blob token
+    
+    if (!siteID || !token) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ 
+          error: 'Missing environment variables. Please set NETLIFY_SITE_ID and NETLIFY_BLOB_TOKEN.' 
+        })
+      };
+    }
+    
+    // Create store with manual configuration
+    const store = getStore({
+      name: 'images',
+      siteID: siteID,
+      token: token
+    });
     
     // Create a unique filename
     const fileName = `browser_${width}x${height}_${timestamp.replace(/[\s:]/g, '-')}.png`;
