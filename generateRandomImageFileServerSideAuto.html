@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Browser Size Display</title>
+</head>
+<body>
+  <div id="loading">Generating image...</div>
+  <img id="sizeImage" alt="Browser size display" style="display:none;">
+
+  <script>
+    // ============================================================
+    // Automatically generate and save image when page loads
+    // ============================================================
+    function generateAndSaveImage() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      
+      const loading = document.getElementById('loading');
+      const img = document.getElementById('sizeImage');
+      
+      // Create canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = 500;
+      canvas.height = 500;
+      const ctx = canvas.getContext('2d');
+      
+      // Draw the image
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 500, 500);
+      
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(5, 5, 490, 490);
+      
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#000000';
+      
+      ctx.font = 'bold 32px Arial, sans-serif';
+      ctx.fillText('Browser Size', 250, 160);
+      
+      ctx.font = 'bold 48px Arial, sans-serif';
+      ctx.fillText(`${width} × ${height}`, 250, 240);
+      
+      ctx.font = '16px Arial, sans-serif';
+      ctx.fillStyle = '#666666';
+      ctx.fillText('pixels', 250, 290);
+      
+      ctx.font = '12px Arial, sans-serif';
+      ctx.fillStyle = '#999999';
+      const now = new Date();
+      const timestamp = now.getFullYear() + '-' + 
+                       String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                       String(now.getDate()).padStart(2, '0') + ' ' + 
+                       String(now.getHours()).padStart(2, '0') + ':' + 
+                       String(now.getMinutes()).padStart(2, '0') + ':' + 
+                       String(now.getSeconds()).padStart(2, '0');
+      ctx.fillText(`Generated: ${timestamp}`, 250, 465);
+      
+      // Convert to base64
+      const dataUrl = canvas.toDataURL('image/png');
+      const base64Data = dataUrl.split(',')[1];
+      
+      // Send to server to save as actual file
+      fetch('/.netlify/functions/generate-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image: base64Data,
+          width: width,
+          height: height,
+          timestamp: timestamp
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Display the saved image file
+          img.src = data.url;
+          img.style.display = 'block';
+          loading.textContent = '✅ Image generated and saved!';
+          loading.style.color = 'green';
+        } else {
+          loading.textContent = '❌ Error: ' + data.error;
+          loading.style.color = 'red';
+        }
+      })
+      .catch(error => {
+        loading.textContent = '❌ Error: ' + error.message;
+        loading.style.color = 'red';
+      });
+    }
+
+    // Run automatically when page loads
+    window.addEventListener('load', generateAndSaveImage);
+  </script>
+</body>
+</html>
