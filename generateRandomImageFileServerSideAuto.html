@@ -6,6 +6,7 @@
 </head>
 <body>
   <div id="loading">Generating image...</div>
+  <div id="error" style="color:red;display:none;"></div>
   <img id="sizeImage" alt="Browser size display" style="display:none;">
 
   <script>
@@ -17,6 +18,7 @@
       const height = window.innerHeight;
       
       const loading = document.getElementById('loading');
+      const errorDiv = document.getElementById('error');
       const img = document.getElementById('sizeImage');
       
       // Create canvas
@@ -63,6 +65,8 @@
       const base64Data = dataUrl.split(',')[1];
       
       // Send to server to save as actual file
+      loading.textContent = 'Saving image to server...';
+      
       fetch('/.netlify/functions/generate-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -73,7 +77,14 @@
           timestamp: timestamp
         })
       })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(data => {
+            throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
+          });
+        }
+        return response.json();
+      })
       .then(data => {
         if (data.success) {
           // Display the saved image file
@@ -81,13 +92,16 @@
           img.style.display = 'block';
           loading.textContent = '✅ Image generated and saved!';
           loading.style.color = 'green';
+          errorDiv.style.display = 'none';
         } else {
-          loading.textContent = '❌ Error: ' + data.error;
-          loading.style.color = 'red';
+          throw new Error(data.error || 'Unknown error');
         }
       })
       .catch(error => {
-        loading.textContent = '❌ Error: ' + error.message;
+        console.error('Error:', error);
+        errorDiv.textContent = '❌ ' + error.message;
+        errorDiv.style.display = 'block';
+        loading.textContent = '❌ Failed to save image';
         loading.style.color = 'red';
       });
     }
