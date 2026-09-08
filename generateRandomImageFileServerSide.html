@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Browser Size Display</title>
+</head>
+<body>
+  <div id="status">Generating image...</div>
+  <br>
+  <img id="sizeImage" alt="Browser size display">
+  <br>
+  <button onclick="saveAndDisplayImage()">Save Image to Cloud</button>
+  <div id="saveStatus"></div>
+
+  <script>
+    function generateImage() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      
+      const canvas = document.createElement('canvas');
+      canvas.width = 500;
+      canvas.height = 500;
+      const ctx = canvas.getContext('2d');
+      
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 500, 500);
+      
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(5, 5, 490, 490);
+      
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#000000';
+      
+      ctx.font = 'bold 32px Arial, sans-serif';
+      ctx.fillText('Browser Size', 250, 160);
+      
+      ctx.font = 'bold 48px Arial, sans-serif';
+      ctx.fillText(`${width} × ${height}`, 250, 240);
+      
+      ctx.font = '16px Arial, sans-serif';
+      ctx.fillStyle = '#666666';
+      ctx.fillText('pixels', 250, 290);
+      
+      ctx.font = '12px Arial, sans-serif';
+      ctx.fillStyle = '#999999';
+      const now = new Date();
+      const timestamp = now.getFullYear() + '-' + 
+                       String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                       String(now.getDate()).padStart(2, '0') + ' ' + 
+                       String(now.getHours()).padStart(2, '0') + ':' + 
+                       String(now.getMinutes()).padStart(2, '0') + ':' + 
+                       String(now.getSeconds()).padStart(2, '0');
+      ctx.fillText(`Generated: ${timestamp}`, 250, 465);
+      
+      return canvas.toDataURL('image/png');
+    }
+
+    function saveAndDisplayImage() {
+      const status = document.getElementById('saveStatus');
+      status.textContent = 'Saving image...';
+      
+      // Generate the image
+      const dataUrl = generateImage();
+      
+      // Extract base64 data
+      const base64Data = dataUrl.split(',')[1];
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      
+      // Send to serverless function
+      fetch('/.netlify/functions/save-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image: base64Data,
+          width: width,
+          height: height
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Display the saved image from the URL
+          document.getElementById('sizeImage').src = data.url;
+          status.textContent = `✅ Image saved! View at: ${data.url}`;
+        } else {
+          status.textContent = `❌ Error: ${data.error}`;
+        }
+      })
+      .catch(error => {
+        status.textContent = `❌ Error: ${error.message}`;
+      });
+    }
+
+    // Show initial image on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const dataUrl = generateImage();
+      document.getElementById('sizeImage').src = dataUrl;
+      document.getElementById('status').textContent = 'Image loaded! Click "Save Image to Cloud" to save permanently.';
+    });
+  </script>
+</body>
+</html>
