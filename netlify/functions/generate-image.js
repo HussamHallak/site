@@ -10,8 +10,22 @@ exports.handler = async (event) => {
   }
 
   try {
-    // Get the image data from the request
-    const { image, width, height, timestamp } = JSON.parse(event.body);
+    console.log('Function started');
+    
+    // Parse the request body
+    let body;
+    try {
+      body = JSON.parse(event.body);
+      console.log('Parsed body:', { width: body.width, height: body.height, hasImage: !!body.image });
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Invalid JSON body' })
+      };
+    }
+
+    const { image, width, height, timestamp } = body;
     
     if (!image) {
       return {
@@ -20,23 +34,28 @@ exports.handler = async (event) => {
       };
     }
 
-    // ============================================================
-    // MANUALLY CONFIGURE BLOB STORAGE
-    // ============================================================
-    // You need to get these values from your Netlify dashboard
-    const siteID = process.env.ba1416c8-1ad6-4d18-9798-83a21c23399b;  // Your site ID
-    const token = process.env.nfp_6DU6kiqu5fDJxtLWzoePzjgwQVEFJVMWf324;  // Your blob token
+    // Get environment variables
+    const siteID = process.env.ba1416c8-1ad6-4d18-9798-83a21c23399b || process.env.ba1416c8-1ad6-4d18-9798-83a21c23399b;
+    const token = process.env.nfp_6DU6kiqu5fDJxtLWzoePzjgwQVEFJVMWf324;
+    
+    console.log('Environment check:', { 
+      hasSiteID: !!siteID, 
+      hasToken: !!token,
+      siteID: siteID ? siteID.substring(0, 10) + '...' : 'missing',
+      token: token ? 'present' : 'missing'
+    });
     
     if (!siteID || !token) {
       return {
         statusCode: 500,
         body: JSON.stringify({ 
-          error: 'Missing environment variables. Please set NETLIFY_SITE_ID and NETLIFY_BLOB_TOKEN.' 
+          error: 'Missing environment variables. Please set SITE_ID and NETLIFY_BLOB_TOKEN.' 
         })
       };
     }
-    
+
     // Create store with manual configuration
+    console.log('Creating blob store...');
     const store = getStore({
       name: 'images',
       siteID: siteID,
@@ -45,17 +64,21 @@ exports.handler = async (event) => {
     
     // Create a unique filename
     const fileName = `browser_${width}x${height}_${timestamp.replace(/[\s:]/g, '-')}.png`;
+    console.log('Filename:', fileName);
     
     // Convert base64 to binary
     const imageBuffer = Buffer.from(image, 'base64');
+    console.log('Image buffer size:', imageBuffer.length, 'bytes');
     
     // Save the file to Netlify Blob Storage
+    console.log('Saving to blob storage...');
     await store.set(fileName, imageBuffer, {
       contentType: 'image/png'
     });
     
     // Get the public URL for the saved file
     const publicUrl = await store.getPublicUrl(fileName);
+    console.log('Public URL:', publicUrl);
     
     return {
       statusCode: 200,
@@ -68,11 +91,13 @@ exports.handler = async (event) => {
     };
   } catch (error) {
     console.error('Error saving image:', error);
+    console.error('Error stack:', error.stack);
     return {
       statusCode: 500,
       body: JSON.stringify({
         success: false,
-        error: error.message
+        error: error.message,
+        stack: error.stack
       })
     };
   }
