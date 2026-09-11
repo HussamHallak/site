@@ -8,6 +8,16 @@
   <img id="sizeImage" alt="Browser size display">
 
   <script>
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    // Update URL with query parameters if they're missing or different
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('width') !== String(width) || params.get('height') !== String(height)) {
+      params.set('width', width);
+      params.set('height', height);
+      history.replaceState(null, '', '?' + params.toString());
+    }    
     // ============================================================
     // Generate image and display automatically when page loads
     // ============================================================
