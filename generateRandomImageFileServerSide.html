@@ -13,6 +13,17 @@
   <div id="saveStatus"></div>
 
   <script>
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    // Update URL with query parameters if they're missing or different
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('width') !== String(width) || params.get('height') !== String(height)) {
+      params.set('width', width);
+      params.set('height', height);
+      history.replaceState(null, '', '?' + params.toString());
+    } 
+    
     function generateImage() {
       const width = window.innerWidth;
       const height = window.innerHeight;
